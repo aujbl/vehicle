@@ -258,7 +258,7 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "车牌识别系统"))
         self.pushButton.setText(_translate("MainWindow", "-"))
-        self.pushButton_2.setText(_translate("MainWindow", "✘"))
+        self.pushButton_2.setText(_translate("MainWindow", "X"))
         self.pushButton_3.setText(_translate("MainWindow", "车牌检测"))
         self.pushButton_4.setText(_translate("MainWindow", "车牌识别"))
         self.pushButton_5.setText(_translate("MainWindow", "车牌颜色"))

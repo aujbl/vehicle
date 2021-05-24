@@ -67,7 +67,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>车牌检测</string>
+     <string>：车牌裁切</string>
     </property>
     <property name="icon">
      <iconset resource="my_pic.qrc">
@@ -97,7 +97,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>车牌识别</string>
+     <string>：车牌识别</string>
     </property>
     <property name="icon">
      <iconset resource="my_pic.qrc">
@@ -127,7 +127,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>车牌颜色</string>
+     <string>：车牌颜色</string>
     </property>
     <property name="icon">
      <iconset resource="my_pic.qrc">
@@ -153,35 +153,18 @@
    <widget class="QPushButton" name="pushButton_6">
     <property name="geometry">
      <rect>
-      <x>710</x>
+      <x>700</x>
       <y>492</y>
-      <width>75</width>
+      <width>181</width>
       <height>41</height>
      </rect>
     </property>
     <property name="text">
-     <string>图像</string>
+     <string>：选择图片</string>
     </property>
     <property name="icon">
      <iconset resource="my_pic.qrc">
       <normaloff>:/pic/pic/image.png</normaloff>:/pic/pic/image.png</iconset>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_7">
-    <property name="geometry">
-     <rect>
-      <x>810</x>
-      <y>490</y>
-      <width>71</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>视频</string>
-    </property>
-    <property name="icon">
-     <iconset resource="my_pic.qrc">
-      <normaloff>:/pic/pic/video.png</normaloff>:/pic/pic/video.png</iconset>
     </property>
    </widget>
    <widget class="QPushButton" name="pushButton_8">
@@ -199,11 +182,7 @@
      </font>
     </property>
     <property name="text">
-     <string>交通门禁车牌检测和识别系统</string>
-    </property>
-    <property name="icon">
-     <iconset resource="my_pic.qrc">
-      <normaloff>:/pic/pic/logo.ico</normaloff>:/pic/pic/logo.ico</iconset>
+     <string>车牌识别系统</string>
     </property>
    </widget>
   </widget>

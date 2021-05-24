@@ -1,136 +1,89 @@
 # -*- coding: utf-8 -*-
 
-"""
-__author__ = xujing
-__date__  = 2019-07-05
-"""
-from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtWidgets import QMainWindow
+# Form implementation generated from reading ui file 'my_main_ui.ui'
+#
+# Created by: PyQt5 UI code generator 5.10.1
+#
+# WARNING! All changes made in this file will be lost!
 
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import  *
-from PyQt5 import *
-from PyQt5.QtGui import *
-from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtWidgets import QMainWindow
+from PyQt5 import QtCore, QtGui, QtWidgets
 
-from  Ui_my_main_ui import Ui_MainWindow
-import sys
-import cv2
-from car_id_detect import *
-from svm_train import *
-from card_seg import *
+class Ui_MainWindow(object):
+    def setupUi(self, MainWindow):
+        MainWindow.setObjectName("MainWindow")
+        MainWindow.resize(906, 600)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(":/pic/pic/logo.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        MainWindow.setWindowIcon(icon)
+        self.centralWidget = QtWidgets.QWidget(MainWindow)
+        self.centralWidget.setObjectName("centralWidget")
+        self.label = QtWidgets.QLabel(self.centralWidget)
+        self.label.setGeometry(QtCore.QRect(30, 50, 611, 501))
+        self.label.setText("")
+        self.label.setObjectName("label")
+        self.pushButton = QtWidgets.QPushButton(self.centralWidget)
+        self.pushButton.setGeometry(QtCore.QRect(720, 20, 75, 23))
+        self.pushButton.setObjectName("pushButton")
+        self.pushButton_2 = QtWidgets.QPushButton(self.centralWidget)
+        self.pushButton_2.setGeometry(QtCore.QRect(810, 20, 75, 23))
+        self.pushButton_2.setObjectName("pushButton_2")
+        self.pushButton_3 = QtWidgets.QPushButton(self.centralWidget)
+        self.pushButton_3.setGeometry(QtCore.QRect(690, 90, 191, 23))
+        icon1 = QtGui.QIcon()
+        icon1.addPixmap(QtGui.QPixmap(":/pic/pic/cut.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_3.setIcon(icon1)
+        self.pushButton_3.setObjectName("pushButton_3")
+        self.label_2 = QtWidgets.QLabel(self.centralWidget)
+        self.label_2.setGeometry(QtCore.QRect(700, 140, 181, 61))
+        self.label_2.setText("")
+        self.label_2.setObjectName("label_2")
+        self.pushButton_4 = QtWidgets.QPushButton(self.centralWidget)
+        self.pushButton_4.setGeometry(QtCore.QRect(690, 230, 191, 23))
+        icon2 = QtGui.QIcon()
+        icon2.addPixmap(QtGui.QPixmap(":/pic/pic/shibie.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_4.setIcon(icon2)
+        self.pushButton_4.setObjectName("pushButton_4")
+        self.label_3 = QtWidgets.QLabel(self.centralWidget)
+        self.label_3.setGeometry(QtCore.QRect(700, 290, 171, 41))
+        self.label_3.setText("")
+        self.label_3.setObjectName("label_3")
+        self.pushButton_5 = QtWidgets.QPushButton(self.centralWidget)
+        self.pushButton_5.setGeometry(QtCore.QRect(700, 360, 181, 23))
+        icon3 = QtGui.QIcon()
+        icon3.addPixmap(QtGui.QPixmap(":/pic/pic/color.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_5.setIcon(icon3)
+        self.pushButton_5.setObjectName("pushButton_5")
+        self.label_4 = QtWidgets.QLabel(self.centralWidget)
+        self.label_4.setGeometry(QtCore.QRect(700, 400, 181, 21))
+        self.label_4.setStyleSheet("background-color: rgb(0, 0, 255);")
+        self.label_4.setText("")
+        self.label_4.setObjectName("label_4")
+        self.pushButton_6 = QtWidgets.QPushButton(self.centralWidget)
+        self.pushButton_6.setGeometry(QtCore.QRect(700, 492, 181, 41))
+        icon4 = QtGui.QIcon()
+        icon4.addPixmap(QtGui.QPixmap(":/pic/pic/image.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_6.setIcon(icon4)
+        self.pushButton_6.setObjectName("pushButton_6")
+        self.pushButton_8 = QtWidgets.QPushButton(self.centralWidget)
+        self.pushButton_8.setGeometry(QtCore.QRect(30, 10, 201, 31))
+        font = QtGui.QFont()
+        font.setFamily("Meiryo UI")
+        self.pushButton_8.setFont(font)
+        self.pushButton_8.setObjectName("pushButton_8")
+        MainWindow.setCentralWidget(self.centralWidget)
 
-class MainWindow(QMainWindow, Ui_MainWindow):
-    """
-    槽函数
-    """
-    def __init__(self, parent=None):
-        """
-        Constructor
-        
-        @param parent reference to the parent widget
-        @type QWidget
-        """
-        super(MainWindow, self).__init__(parent)
-        self.setupUi(self)
-    
-    @pyqtSlot()
-    def on_pushButton_clicked(self):
-        """
-        最下化
-        """
-        print('最小化')
-        QMainWindow.showMinimized(self)
-    
-    @pyqtSlot()
-    def on_pushButton_2_clicked(self):
-        """
-        退出
-        """
-        print("退出")
-        sys.exit(0)
-    
-    @pyqtSlot()
-    def on_pushButton_6_clicked(self):
-        """
-        加载图像
-        """
-        print("加载图像")
-        try:
-            self.file_dir_temp,_ = QFileDialog.getOpenFileName(self,"选择被检测的车辆","D:/")
-            self.file_dir = self.file_dir_temp.replace("\\","/")
-            print(self.file_dir)
+        self.retranslateUi(MainWindow)
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-            roi, label, color = CaridDetect(self.file_dir)
-            seg_dict, _, pre = Cardseg([roi],[color],None)
-            print(pre)
+    def retranslateUi(self, MainWindow):
+        _translate = QtCore.QCoreApplication.translate
+        MainWindow.setWindowTitle(_translate("MainWindow", "车牌识别系统"))
+        self.pushButton.setText(_translate("MainWindow", "最小化"))
+        self.pushButton_2.setText(_translate("MainWindow", "关闭"))
+        self.pushButton_3.setText(_translate("MainWindow", "：车牌裁切"))
+        self.pushButton_4.setText(_translate("MainWindow", "：车牌识别"))
+        self.pushButton_5.setText(_translate("MainWindow", "：车牌颜色"))
+        self.pushButton_6.setText(_translate("MainWindow", "：选择图片"))
+        self.pushButton_8.setText(_translate("MainWindow", "车牌识别系统"))
 
-            # segment
-            cv2.imwrite(os.path.join("./temp/seg_card.jpg"),roi)
-            seg_img = cv2.imread("./temp/seg_card.jpg")
-            seg_rows, seg_cols, seg_channels = seg_img.shape
-            bytesPerLine = seg_channels * seg_cols
-            cv2.cvtColor(seg_img, cv2.COLOR_BGR2RGB,seg_img)
-            QImg = QImage(seg_img.data, seg_cols, seg_rows,bytesPerLine, QImage.Format_RGB888)
-            self.label_2.setPixmap(QPixmap.fromImage(QImg).scaled(self.label_2.size(), 
-                Qt.KeepAspectRatio, Qt.SmoothTransformation))
-
-            # reg result
-            pre.insert(2,"·")
-            self.label_3.setText(" "+"".join(pre))
-
-            # clor view
-            if color == "yello":
-                self.label_4.setStyleSheet("background-color: rgb(255, 255, 0);")
-            elif color == "green":
-                self.label_4.setStyleSheet("background-color: rgb(0, 255,0);")
-            elif color == "blue":
-                self.label_4.setStyleSheet("background-color: rgb(0, 0, 255);")
-            else:
-                self.label_4.setText("未识别出车牌颜色")
-
-
-            frame = cv2.imread(self.file_dir)
-            # cv2.rectangle(frame, (label[0],label[2]), (label[1],label[3]), (0,0,255), 2)
-            font = cv2.FONT_HERSHEY_SIMPLEX
-            cv2.putText(frame, 'https://github.com/DataXujing/vehicle-license-plate-recognition', (10, 10), font, 0.3, (0, 0, 255), 1)
-            img_rows, img_cols, channels = frame.shape
-            bytesPerLine = channels * img_cols
-            cv2.cvtColor(frame, cv2.COLOR_BGR2RGB,frame)
-            QImg = QImage(frame.data, img_cols, img_rows,bytesPerLine, QImage.Format_RGB888)
-            self.label.setPixmap(QPixmap.fromImage(QImg).scaled(self.label.size(), 
-                Qt.KeepAspectRatio, Qt.SmoothTransformation))
-            QtWidgets.QApplication.processEvents()
-        
-        except Exception as e:
-            QMessageBox.warning(self,"错误提示","[错误提示(请联系开发人员处理)]：\n" + str(e)+"\n或识别失败导致")
-
-    
-    @pyqtSlot()
-    def on_pushButton_7_clicked(self):
-        """
-        加载视频
-        """
-        print("加载视频")
-        QMessageBox.information(self,"加载实时视频","未检测到实时视频源或暂未开通快该服务！")
-
-
-
-
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    
-    splash = QSplashScreen(QtGui.QPixmap(':/pic/pic/face.png'))
-
-    splash.show()
-    splash.showMessage('渲染界面...')
-    QThread.sleep(0.6)
-    splash.showMessage('正在初始化程序...')
-    QThread.sleep(0.6)
-    app. processEvents()
-    ui =MainWindow()
-    ui.show()
-    splash.finish(ui)
-
-    sys.exit(app.exec_())
+import my_pic_rc
