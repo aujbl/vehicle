@@ -7,8 +7,8 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-# __author__ = xujing
-# __date__ = 2019-07-05
+# __author__ = lee
+# __date__ = 2021-05-24
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QToolTip
@@ -256,7 +256,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "交通门禁车牌检测和识别系统"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "车牌识别系统"))
         self.pushButton.setText(_translate("MainWindow", "-"))
         self.pushButton_2.setText(_translate("MainWindow", "✘"))
         self.pushButton_3.setText(_translate("MainWindow", "车牌检测"))
@@ -264,7 +264,7 @@ class Ui_MainWindow(object):
         self.pushButton_5.setText(_translate("MainWindow", "车牌颜色"))
         self.pushButton_6.setText(_translate("MainWindow", "图像"))
         self.pushButton_7.setText(_translate("MainWindow", "视频"))
-        self.pushButton_8.setText(_translate("MainWindow", "交通门禁车牌检测和识别系统"))
+        self.pushButton_8.setText(_translate("MainWindow", "车牌识别系统"))
 
 import my_pic_rc
 
