@@ -10,6 +10,10 @@
 # __author__ = lee
 # __date__ = 2021-05-24
 
+'''
+qss = 花里胡哨
+'''
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QToolTip
 from PyQt5.QtGui import QFont,QIcon
@@ -174,73 +178,93 @@ class Ui_MainWindow(object):
         MainWindow.setWindowFlag(QtCore.Qt.FramelessWindowHint) # 隐藏边框
         MainWindow.setWindowOpacity(0.95) # 设置窗口透明度
 
+        #设置控件样式
         self.centralWidget = QtWidgets.QWidget(MainWindow)
         self.centralWidget.setObjectName("centralWidget")
         self.centralWidget.setStyleSheet(qss3)
+
         self.label = QtWidgets.QLabel(self.centralWidget)
         self.label.setGeometry(QtCore.QRect(30, 50, 611, 501))
         self.label.setText("")
         self.label.setObjectName("label")
+
         self.pushButton = QtWidgets.QPushButton(self.centralWidget)
         self.pushButton.setGeometry(QtCore.QRect(720, 20, 75, 23))
         self.pushButton.setObjectName("pushButton")
+
         QToolTip.setFont(QFont("SansSerif",6))
+
         self.pushButton.setToolTip("<b>最小化</b>")
         self.pushButton.setStyleSheet('''QPushButton{background:#F76677;border-radius:5px;}QPushButton:hover{background:red;}''')
+
         self.pushButton_2 = QtWidgets.QPushButton(self.centralWidget)
         self.pushButton_2.setGeometry(QtCore.QRect(810, 20, 75, 23))
         self.pushButton_2.setObjectName("pushButton_2")
         self.pushButton_2.setToolTip("<b>关闭</b>")
         self.pushButton_2.setStyleSheet('''QPushButton{background:#6DDF6D;border-radius:5px;}QPushButton:hover{background:green;}''')
+
         self.pushButton_3 = QtWidgets.QPushButton(self.centralWidget)
         self.pushButton_3.setGeometry(QtCore.QRect(690, 90, 191, 23))
-        icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap(":/pic/pic/cut.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_3.setIcon(icon1)
+
+        # icon1 = QtGui.QIcon()
+        # icon1.addPixmap(QtGui.QPixmap(":/pic/pic/cut.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        #
+        # self.pushButton_3.setIcon(icon1)
         self.pushButton_3.setObjectName("pushButton_3")
-        self.pushButton_3.setStyleSheet(qss1)
+        # self.pushButton_3.setStyleSheet(qss1)
+
         self.label_2 = QtWidgets.QLabel(self.centralWidget)
         self.label_2.setGeometry(QtCore.QRect(700, 140, 181, 61))
         self.label_2.setText("")
         self.label_2.setObjectName("label_2")
+
         self.pushButton_4 = QtWidgets.QPushButton(self.centralWidget)
         self.pushButton_4.setGeometry(QtCore.QRect(690, 230, 191, 23))
-        icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap(":/pic/pic/shibie.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_4.setIcon(icon2)
+
+        # icon2 = QtGui.QIcon()
+        # icon2.addPixmap(QtGui.QPixmap(":/pic/pic/shibie.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        #
+        # self.pushButton_4.setIcon(icon2)
         self.pushButton_4.setObjectName("pushButton_4")
-        self.pushButton_4.setStyleSheet(qss1)
+        # self.pushButton_4.setStyleSheet(qss1)
+
         self.label_3 = QtWidgets.QLabel(self.centralWidget)
         self.label_3.setGeometry(QtCore.QRect(700, 290, 171, 41))
         self.label_3.setText("")
         self.label_3.setObjectName("label_3")
         self.label_3.setStyleSheet("color: rgb(255, 255, 255);font-size: 24px;font-weight:1000;")
+
         self.pushButton_5 = QtWidgets.QPushButton(self.centralWidget)
         self.pushButton_5.setGeometry(QtCore.QRect(700, 360, 181, 23))
-        icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap(":/pic/pic/color.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_5.setIcon(icon3)
+        # icon3 = QtGui.QIcon()
+        # icon3.addPixmap(QtGui.QPixmap(":/pic/pic/color.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        # self.pushButton_5.setIcon(icon3)
         self.pushButton_5.setObjectName("pushButton_5")
-        self.pushButton_5.setStyleSheet(qss1)
+        # self.pushButton_5.setStyleSheet(qss1)
+
         self.label_4 = QtWidgets.QLabel(self.centralWidget)
         self.label_4.setGeometry(QtCore.QRect(700, 400, 181, 21))
         self.label_4.setStyleSheet("color: rgb(255, 255, 255);")
         self.label_4.setText("")
         self.label_4.setObjectName("label_4")
+
         self.pushButton_6 = QtWidgets.QPushButton(self.centralWidget)
-        self.pushButton_6.setGeometry(QtCore.QRect(710, 492, 75, 41))
+        self.pushButton_6.setGeometry(QtCore.QRect(700, 492, 181, 41))
+        # self.pushButton_6.setGeometry(QtCore.QRect(710, 492, 75, 41))
         icon4 = QtGui.QIcon()
         icon4.addPixmap(QtGui.QPixmap(":/pic/pic/image.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.pushButton_6.setIcon(icon4)
         self.pushButton_6.setObjectName("pushButton_6")
         self.pushButton_6.setStyleSheet(qss6)
-        self.pushButton_7 = QtWidgets.QPushButton(self.centralWidget)
-        self.pushButton_7.setGeometry(QtCore.QRect(810, 490, 71, 41))
-        icon5 = QtGui.QIcon()
-        icon5.addPixmap(QtGui.QPixmap(":/pic/pic/video.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_7.setIcon(icon5)
-        self.pushButton_7.setObjectName("pushButton_7")
-        self.pushButton_7.setStyleSheet(qss6)
+
+        # self.pushButton_7 = QtWidgets.QPushButton(self.centralWidget)
+        # self.pushButton_7.setGeometry(QtCore.QRect(810, 490, 71, 41))
+        # icon5 = QtGui.QIcon()
+        # icon5.addPixmap(QtGui.QPixmap(":/pic/pic/video.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        # self.pushButton_7.setIcon(icon5)
+        # self.pushButton_7.setObjectName("pushButton_7")
+        # self.pushButton_7.setStyleSheet(qss6)
+
         self.pushButton_8 = QtWidgets.QPushButton(self.centralWidget)
         self.pushButton_8.setGeometry(QtCore.QRect(30, 10, 231, 31))
         font = QtGui.QFont()
@@ -249,6 +273,7 @@ class Ui_MainWindow(object):
         self.pushButton_8.setIcon(icon)
         self.pushButton_8.setObjectName("pushButton_8")
         self.pushButton_8.setStyleSheet(qss1)
+
         MainWindow.setCentralWidget(self.centralWidget)
 
         self.retranslateUi(MainWindow)
@@ -262,8 +287,8 @@ class Ui_MainWindow(object):
         self.pushButton_3.setText(_translate("MainWindow", "车牌检测"))
         self.pushButton_4.setText(_translate("MainWindow", "车牌识别"))
         self.pushButton_5.setText(_translate("MainWindow", "车牌颜色"))
-        self.pushButton_6.setText(_translate("MainWindow", "图像"))
-        self.pushButton_7.setText(_translate("MainWindow", "视频"))
+        self.pushButton_6.setText(_translate("MainWindow", "：选择图片"))
+        # self.pushButton_7.setText(_translate("MainWindow", "视频"))
         self.pushButton_8.setText(_translate("MainWindow", "车牌识别系统"))
 
 import my_pic_rc

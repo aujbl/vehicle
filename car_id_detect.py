@@ -273,13 +273,12 @@ def CaridDetect(car_pic):
 				xr = col_num
 		card_imgs[card_index] = card_img[yl:yh, xl:xr] if color != "green" or yl < (yh-yl)//4 else card_img[yl-(yh-yl)//4:yh, xl:xr]
 
-
 		roi = card_img
 		card_color = color
 		labels = (int(right_point[1]), int(heigth_point[1]), int(left_point[0]), int(right_point[0]))
 
-			
-	return roi,labels, card_color#定位的车牌图像、车牌颜色
+		# 定位的车牌图像、车牌颜色
+	return roi,labels, card_color
 
 if __name__ == '__main__':
 	for pic_file in os.listdir("./test_img"):
