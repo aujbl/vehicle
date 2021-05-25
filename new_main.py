@@ -46,7 +46,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def on_pushButton_6_clicked(self):
         """加载图像"""
         try:
-            self.file_dir_temp, _ = QFileDialog.getOpenFileName(self, "请选择图片...", "D:/")
+            self.file_dir_temp, _ = QFileDialog.getOpenFileName(self, "请选择图片...", "./test_img")
             self.file_dir = self.file_dir_temp.replace("\\", "/")
             print(self.file_dir)
 
@@ -68,16 +68,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             pre.insert(2, "·")
             self.label_3.setText(" " + "".join(pre))
 
-            # clor view
-            if color == "yello":
+            # color view
+            if color == "yellow":
                 self.label_4.setStyleSheet("background-color: rgb(255, 255, 0);")
-                self.label_4.setText("黄色")
+                self.label_4.setText("        黄色")
             elif color == "green":
                 self.label_4.setStyleSheet("background-color: rgb(0, 255,0);")
-                self.label_4.setText("绿色")
+                self.label_4.setText("        绿色")
             elif color == "blue":
                 self.label_4.setStyleSheet("background-color: rgb(0, 0, 255);")
-                self.label_4.setText("蓝色")
+                self.label_4.setText("        蓝色")
             else:
                 self.label_4.setText("未识别出车牌颜色")
 

@@ -63,11 +63,11 @@ def CaridDetect(car_pic):
 
 	# 加载图片
 	img = cv2.imread(car_pic)
-	pic_hight, pic_width = img.shape[:2]
+	pic_height, pic_width = img.shape[:2]
 
 	if pic_width > MAX_WIDTH:
 		resize_rate = MAX_WIDTH / pic_width
-		img = cv2.resize(img, (MAX_WIDTH, int(pic_hight*resize_rate)), interpolation=cv2.INTER_AREA)
+		img = cv2.resize(img, (MAX_WIDTH, int(pic_height*resize_rate)), interpolation=cv2.INTER_AREA)
 	# 车牌识别的部分参数保存在js中，便于根据图片分辨率做调整
 	f = open('config.js')
 	j = json.load(f)
@@ -90,7 +90,7 @@ def CaridDetect(car_pic):
 	kernel = np.ones((20, 20), np.uint8)
 	# morphologyEx 形态学变化函数
 	img_opening = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
-	img_opening = cv2.addWeighted(img, 1, img_opening, -1, 0);
+	img_opening = cv2.addWeighted(img, 1, img_opening, -1, 0)
 
 	# 找到图像边缘 Canny边缘检测
 	ret, img_thresh = cv2.threshold(img_opening, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
@@ -151,42 +151,42 @@ def CaridDetect(car_pic):
 
 		box = cv2.boxPoints(rect)
 		# 避免边界超出图像边界
-		heigth_point = right_point = [0, 0]
-		left_point = low_point = [pic_width, pic_hight]
+		height_point = right_point = [0, 0]
+		left_point = low_point = [pic_width, pic_height]
 		for point in box:
 			if left_point[0] > point[0]:
 				left_point = point
 			if low_point[1] > point[1]:
 				low_point = point
-			if heigth_point[1] < point[1]:
-				heigth_point = point
+			if height_point[1] < point[1]:
+				height_point_point = point
 			if right_point[0] < point[0]:
 				right_point = point
 
 		if left_point[1] <= right_point[1]: # 正角度
-			new_right_point = [right_point[0], heigth_point[1]]
-			pts2 = np.float32([left_point, heigth_point, new_right_point])#字符只是高度需要改变
-			pts1 = np.float32([left_point, heigth_point, right_point])
+			new_right_point = [right_point[0], height_point[1]]
+			pts2 = np.float32([left_point, height_point, new_right_point])#字符只是高度需要改变
+			pts1 = np.float32([left_point, height_point, right_point])
 			M = cv2.getAffineTransform(pts1, pts2) # 仿射变换
-			dst = cv2.warpAffine(oldimg, M, (pic_width, pic_hight))
+			dst = cv2.warpAffine(oldimg, M, (pic_width, pic_height))
 			point_limit(new_right_point)
-			point_limit(heigth_point)
+			point_limit(height_point)
 			point_limit(left_point)
-			card_img = dst[int(left_point[1]):int(heigth_point[1]), int(left_point[0]):int(new_right_point[0])]
+			card_img = dst[int(left_point[1]):int(height_point[1]), int(left_point[0]):int(new_right_point[0])]
 			card_imgs.append(card_img)
 			#cv2.imshow("card", card_img)
 			#cv2.waitKey(0)
 		elif left_point[1] > right_point[1]: # 负角度
 			
-			new_left_point = [left_point[0], heigth_point[1]]
-			pts2 = np.float32([new_left_point, heigth_point, right_point])#字符只是高度需要改变
-			pts1 = np.float32([left_point, heigth_point, right_point])
+			new_left_point = [left_point[0], height_point[1]]
+			pts2 = np.float32([new_left_point, height_point, right_point])#字符只是高度需要改变
+			pts1 = np.float32([left_point, height_point, right_point])
 			M = cv2.getAffineTransform(pts1, pts2)
-			dst = cv2.warpAffine(oldimg, M, (pic_width, pic_hight))
+			dst = cv2.warpAffine(oldimg, M, (pic_width, pic_height))
 			point_limit(right_point)
-			point_limit(heigth_point)
+			point_limit(height_point)
 			point_limit(new_left_point)
-			card_img = dst[int(right_point[1]):int(heigth_point[1]), int(new_left_point[0]):int(right_point[0])]
+			card_img = dst[int(right_point[1]):int(height_point[1]), int(new_left_point[0]):int(right_point[0])]
 			card_imgs.append(card_img)
 			#cv2.imshow("card", card_img)
 			#cv2.waitKey(0)
@@ -195,7 +195,7 @@ def CaridDetect(car_pic):
 
 	colors = []
 	for card_index,card_img in enumerate(card_imgs):
-		green = yello = blue = black = white = 0
+		green = yellow = blue = black = white = 0
 		card_img_hsv = cv2.cvtColor(card_img, cv2.COLOR_BGR2HSV)
 		#有转换失败的可能，原因来自于上面矫正矩形出错
 		if card_img_hsv is None:
@@ -209,7 +209,7 @@ def CaridDetect(car_pic):
 				S = card_img_hsv.item(i, j, 1)
 				V = card_img_hsv.item(i, j, 2)
 				if 11 < H <= 34 and S > 34:#图片分辨率调整
-					yello += 1
+					yellow += 1
 				elif 35 < H <= 99 and S > 34:#图片分辨率调整
 					green += 1
 				elif 99 < H <= 124 and S > 34:#图片分辨率调整
@@ -222,10 +222,11 @@ def CaridDetect(car_pic):
 		color = "no"
 
 		limit1 = limit2 = 0
-		if yello*2 >= card_img_count:
-			color = "yello"
+		if yellow*2 >= card_img_count:
+			color = "yellow"
 			limit1 = 11
-			limit2 = 34#有的图片有色偏偏绿
+			# 有的图片有色偏偏绿
+			limit2 = 34
 		elif green*2 >= card_img_count:
 			color = "green"
 			limit1 = 35
@@ -233,20 +234,21 @@ def CaridDetect(car_pic):
 		elif blue*2 >= card_img_count:
 			color = "blue"
 			limit1 = 100
-			limit2 = 124#有的图片有色偏偏紫
+			# 有的图片有色偏偏紫
+			limit2 = 124
 		elif black + white >= card_img_count*0.7: #TODO
 			color = "bw"
 		# print("[ INFO ] color: {}".format(color))
 		colors.append(color)
-		# print(blue, green, yello, black, white, card_img_count)
-		#cv2.imshow("color", card_img)
-		#cv2.waitKey(0)
+		# print(blue, green, yellow, black, white, card_img_count)
+		# cv2.imshow("color", card_img)
+		# cv2.waitKey(0)
 		if limit1 == 0:
 			continue
-		#以上为确定车牌颜色
+		# 以上为确定车牌颜色
 
-		#以下为根据车牌颜色再定位，缩小边缘非车牌边界
-		xl, xr, yh, yl = accurate_place(card_img_hsv, limit1, limit2, color,cfg)
+		# 以下为根据车牌颜色再定位，缩小边缘非车牌边界
+		xl, xr, yh, yl = accurate_place(card_img_hsv, limit1, limit2, color, cfg)
 		if yl == yh and xl == xr:
 			continue
 		need_accurate = False
@@ -258,11 +260,13 @@ def CaridDetect(car_pic):
 			xl = 0
 			xr = col_num
 			need_accurate = True
-		card_imgs[card_index] = card_img[yl:yh, xl:xr] if color != "green" or yl < (yh-yl)//4 else card_img[yl-(yh-yl)//4:yh, xl:xr]
-		if need_accurate:#可能x或y方向未缩小，需要再试一次
+		card_imgs[card_index] = card_img[yl:yh, xl:xr] if color != "green" or yl < (yh-yl)//4 \
+														else card_img[yl-(yh-yl)//4:yh, xl:xr]
+		# 可能x或y方向未缩小，需要再试一次
+		if need_accurate:
 			card_img = card_imgs[card_index]
 			card_img_hsv = cv2.cvtColor(card_img, cv2.COLOR_BGR2HSV)
-			xl, xr, yh, yl = accurate_place(card_img_hsv, limit1, limit2, color,cfg)
+			xl, xr, yh, yl = accurate_place(card_img_hsv, limit1, limit2, color, cfg)
 			if yl == yh and xl == xr:
 				continue
 			if yl >= yh:
@@ -271,23 +275,22 @@ def CaridDetect(car_pic):
 			if xl >= xr:
 				xl = 0
 				xr = col_num
-		card_imgs[card_index] = card_img[yl:yh, xl:xr] if color != "green" or yl < (yh-yl)//4 else card_img[yl-(yh-yl)//4:yh, xl:xr]
+		card_imgs[card_index] = card_img[yl:yh, xl:xr] if color != "green" or yl < (yh-yl)//4 \
+													else card_img[yl-(yh-yl)//4:yh, xl:xr]
 
 		roi = card_img
 		card_color = color
-		labels = (int(right_point[1]), int(heigth_point[1]), int(left_point[0]), int(right_point[0]))
+		labels = (int(right_point[1]), int(height_point[1]), int(left_point[0]), int(right_point[0]))
 
 		# 定位的车牌图像、车牌颜色
-	return roi,labels, card_color
+	return roi, labels, card_color
 
 if __name__ == '__main__':
 	for pic_file in os.listdir("./test_img"):
 
-		roi, label,color = CaridDetect(os.path.join("./test_img",pic_file))
-		cv2.imwrite(os.path.join("./result",pic_file),roi)
+		roi, label, color = CaridDetect(os.path.join("./test_img", pic_file))
+		cv2.imwrite(os.path.join("./result", pic_file), roi)
 		print("*"*50)
 		print("[ ROI ] {}".format(roi))
 		print("[ Color ] {}".format(color))
 		print("[ Label ] {}".format(label))
-
-	
