@@ -23,14 +23,9 @@ from card_seg import *
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
-    """
-    槽函数
-    """
-
     def __init__(self, parent=None):
         """
         Constructor
-
         @param parent reference to the parent widget
         @type QWidget
         """
@@ -39,26 +34,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     @pyqtSlot()
     def on_pushButton_clicked(self):
-        """
-        最下化
-        """
-        print('最小化')
+        """最小化"""
         QMainWindow.showMinimized(self)
 
     @pyqtSlot()
     def on_pushButton_2_clicked(self):
-        """
-        退出
-        """
-        print("退出")
+        """退出"""
         sys.exit(0)
 
     @pyqtSlot()
     def on_pushButton_6_clicked(self):
-        """
-        加载图像
-        """
-        print("加载图像")
+        """加载图像"""
         try:
             self.file_dir_temp, _ = QFileDialog.getOpenFileName(self, "请选择图片...", "D:/")
             self.file_dir = self.file_dir_temp.replace("\\", "/")
@@ -85,10 +71,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             # clor view
             if color == "yello":
                 self.label_4.setStyleSheet("background-color: rgb(255, 255, 0);")
+                self.label_4.setText("黄色")
             elif color == "green":
                 self.label_4.setStyleSheet("background-color: rgb(0, 255,0);")
+                self.label_4.setText("绿色")
             elif color == "blue":
                 self.label_4.setStyleSheet("background-color: rgb(0, 0, 255);")
+                self.label_4.setText("蓝色")
             else:
                 self.label_4.setText("未识别出车牌颜色")
 
@@ -108,28 +97,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         except Exception as e:
             QMessageBox.warning(self, "错误提示", "[错误提示(请联系开发人员处理)]：\n" + str(e) + "\n或识别失败导致")
 
-    # @pyqtSlot()
-    # def on_pushButton_7_clicked(self):
-    #     """
-    #     加载视频
-    #     """
-    #     print("加载视频")
-    #     QMessageBox.information(self, "加载实时视频", "未检测到实时视频源或暂未开通快该服务！")
 
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
 
-    splash = QSplashScreen(QtGui.QPixmap(':/pic/pic/face.png'))
-
-    splash.show()
-    splash.showMessage('渲染界面...')
-    QThread.sleep(0.6)
-    splash.showMessage('正在初始化程序...')
-    QThread.sleep(0.6)
     app.processEvents()
     ui = MainWindow()
     ui.show()
-    splash.finish(ui)
 
     sys.exit(app.exec_())

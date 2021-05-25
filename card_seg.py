@@ -168,7 +168,7 @@ def Cardseg(rois,colors,save_path):
 
 if __name__ == "__main__":
 	for pic_file in os.listdir("./test_img"):
-		roi, label, color = CaridDetect(os.path.join("./test_img",pic_file))
+		roi, label, color = CaridDetect(os.path.join("./test_img", pic_file))
 
 		save_path = "./result_seg/"+pic_file.split(".")[0]
 		if not  os.path.exists(save_path):
