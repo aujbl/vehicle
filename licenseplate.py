@@ -31,11 +31,35 @@ blur = 3
 img = cv2.GaussianBlur(img, (blur, blur), 0)
 oldimg = img
 img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-imshow(img)
 
-kernal = np.ones((10, 10), np.uint8)
-img_opening = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernal)
-imshow(img_opening)
+#开操作
+kernel = np.ones((20, 20), np.uint8)
+img_opening = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
+# addWeighted: dst = src1*alpha + src2*beta + gamma;
+img_opening = cv2.addWeighted(img, 1, img_opening, -1, 0)
+
+# Canny边缘检测
+ret, img_thresh = cv2.threshold(img_opening, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+img_edge = cv2.Canny(img_thresh, 100, 200)
+
+# 先闭后开运算
+kernel = np.ones((cfg['morphologyr'], cfg['morphologyc']), np.uint8)
+img_edge = cv2.morphologyEx(img_edge, cv2.MORPH_CLOSE, kernel)
+img_edge = cv2.morphologyEx(img_edge, cv2.MORPH_OPEN, kernel)
+
+contours, _ = cv2.findContours(img_edge, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+# 筛选可能的区域轮廓
+car_contours = []
+for contour in contours:
+	# rect: ((center), (w, h), angle)
+	rect = cv2.minAreaRect(contour)
+	rw, rh = rect[1]
+	ratio = rh / rw
+	# 长宽比例约为2~5.5的比较可能为车牌
+	if 2 < ratio < 5.5:
+		car_contours.append(contour)
+		contour_img = cv2.drawContours(oldimg, contour, -1, color=(0, 0, 255), )
+imshow(contour_img)
 
 
 

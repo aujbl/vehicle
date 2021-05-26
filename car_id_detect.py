@@ -89,27 +89,21 @@ def CaridDetect(car_pic):
 		img = cv2.GaussianBlur(img, (blur, blur), 0) #图片分辨率调整
 	oldimg = img
 	img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-	imshow(img)
 	#equ = cv2.equalizeHist(img)
 	#img = np.hstack((img, equ))
 	# 去掉图像中不会是车牌的区域
 	kernel = np.ones((10, 10), np.uint8)
 	# morphologyEx 形态学变化函数
 	img_opening = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
-	imshow(img_opening, 'img_opening')
 	img_opening = cv2.addWeighted(img, 1, img_opening, -1, 0)
-	imshow(img_opening, 'img_opening')
 
 	# 找到图像边缘 Canny边缘检测
 	ret, img_thresh = cv2.threshold(img_opening, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 	img_edge = cv2.Canny(img_thresh, 100, 200)
-	imshow(img_edge, 'img_edge')
 	# 使用开运算和闭运算让图像边缘成为一个整体
 	kernel = np.ones((cfg["morphologyr"], cfg["morphologyc"]), np.uint8)
 	img_edge1 = cv2.morphologyEx(img_edge, cv2.MORPH_CLOSE, kernel)
-	imshow(img_edge1, 'img_edge1')
 	img_edge2 = cv2.morphologyEx(img_edge1, cv2.MORPH_OPEN, kernel)
-	imshow(img_edge2, 'img_edge2')
 	# 查找图像边缘整体形成的矩形区域，可能有很多，车牌就在其中一个矩形区域中
 	# cv2.findContours()函数来查找检测物体的轮廓
 	try:
