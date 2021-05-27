@@ -56,3 +56,5 @@
 4.[车牌识别（一）-车牌定位](https://www.cnblogs.com/polly333/p/7367479.html)
 
 5.[在PyQt5中美化和装扮图形界面](https://zmister.com/archives/477.html)
+
+6.[汽车车牌识别系统实现（三）-- 车牌矫正+字符分割+代码实现](https://bbs.huaweicloud.com/blogs/202913)
