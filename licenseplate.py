@@ -4,6 +4,7 @@ from numpy.linalg import norm
 import sys
 import os
 import json
+from matplotlib import pyplot as plt
 
 SZ = 20          # 训练图片长宽
 MAX_WIDTH = 1000 # 原始图片最大宽度
@@ -59,7 +60,7 @@ img_edge = cv2.morphologyEx(img_edge, cv2.MORPH_CLOSE, kernel)
 img_edge = cv2.morphologyEx(img_edge, cv2.MORPH_OPEN, kernel)
 
 contours, _ = cv2.findContours(img_edge, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-# 画出轮廓的最小外接矩形，根据外接矩形的长宽比筛选可能的区域，长宽比在2~5之间是可能存在车牌的区域
+# 画出轮廓的最小外接矩形，根据外接矩形的长宽比筛选可能的区域，长宽比在2~5.5之间是可能存在车牌的区域
 car_rects = []
 for contour in contours:
 	# rect: ((center), (w, h), angle)
@@ -75,6 +76,93 @@ for contour in contours:
 # 		contour_img = cv2.drawContours(oldimg, [box], 0, (0, 0, 255), 2)
 # imshow(contour_img)
 
+car_imgs = []
+# 矩形区域可能是倾斜的矩形
+for rect in car_rects:
+
+	box = cv2.boxPoints(rect)
+	box = np.int0(box)
+	oldimg = cv2.drawContours(oldimg, [box], 0, (0, 0, 255), 2)
+
+	(cen_x, cen_y), (w, h), angle = rect
+	angle = angle if w > h else -angle - 90
+	print('(w, h): ', rect[1], 'angle: ', rect[2])
+	print('new angle: ', angle)
+	if w < h:
+		w, h = h, w
+	left, right = int(cen_x - w / 2), int(cen_x + w / 2)
+	up, down = int(cen_y - h / 2), int(cen_y + h / 2)
+	if angle % 90 == 0:
+		rotate_img = oldimg
+	else:
+		M = cv2.getRotationMatrix2D((cen_x, cen_y), angle, 1)
+		rotate_img = cv2.warpAffine(oldimg, M, (oldimg.shape[1], oldimg.shape[0]))
+	car_img = rotate_img[up:down, left:right]
+
+	# plt.figure()
+	# plt.subplot(1, 3, 1)
+	# plt.imshow(oldimg)
+	# plt.subplot(1, 3, 2)
+	# plt.imshow(rotate_img)
+	# plt.subplot(1, 3, 3)
+	# plt.imshow(car_img)
+	# plt.show()
+
+	# angle = 1 if -1 < rect[2] < 1 else rect[2]
+	# 扩大rect范围，避免车牌边缘被排除
+	# rect = (rect[0], (rect[1][0] + 5, rect[1][1] + 5), angle)
+	'''
+	.................*(top).................... - - >
+	| ........*(left)..*.......................
+	| .........*........*(right)..............
+	v ..........*(low).........................
+	左：x坐标最小，右：x坐标最大，顶：y坐标最小，底：y坐标最大
+	'''
+	# box = cv2.boxPoints(rect)
+	# box = np.int0(box)
+	# contour_img = cv2.drawContours(oldimg, [box], 0, (0, 0, 255), 2)
+	# imshow(contour_img)
+
+
+	# # 按第一列排序
+	# box = box[np.lexsort(box[:, ::-1].T)]
+	# left_point, right_point = box[0], box[-1]
+	# # 按最后一列排序
+	# box = box[np.lexsort(box.T)]
+	# height_point, low_point = box[0], box[-1]
+	#
+	# if left_point[1] <= right_point[1]:  # 正角度
+	# 	new_right_point = [right_point[0], height_point[1]]
+	# 	pts2 = np.float32([left_point, height_point, new_right_point])  # 字符只是高度需要改变
+	# 	pts1 = np.float32([left_point, height_point, right_point])
+	# 	M = cv2.getAffineTransform(pts1, pts2)  # 仿射变换
+	# 	dst = cv2.warpAffine(oldimg, M, (pic_width, pic_height))
+	# 	point_limit(new_right_point)
+	# 	point_limit(height_point)
+	# 	point_limit(left_point)
+	# 	card_img = dst[int(left_point[1]):int(height_point[1]), int(left_point[0]):int(new_right_point[0])]
+	# 	card_imgs.append(card_img)
+	# elif left_point[1] > right_point[1]:  # 负角度
+	# 	new_left_point = [left_point[0], height_point[1]]
+	# 	pts2 = np.float32([new_left_point, height_point, right_point])  # 字符只是高度需要改变
+	# 	pts1 = np.float32([left_point, height_point, right_point])
+	# 	M = cv2.getAffineTransform(pts1, pts2)
+	# 	dst = cv2.warpAffine(oldimg, M, (pic_width, pic_height))
+	# 	point_limit(right_point)
+	# 	point_limit(height_point)
+	# 	point_limit(new_left_point)
+	# 	card_img = dst[int(right_point[1]):int(height_point[1]), int(new_left_point[0]):int(right_point[0])]
+	# 	card_imgs.append(card_img)
+	# imshow(card_img)
+
+
+
+
+
+
+
+
+
 # # 对可能的区域进行旋转调整和扩大范围
 # car_imgs = []
 # for rect in car_rects:
@@ -85,7 +173,7 @@ for contour in contours:
 # 	imgWidth, imgHeight = img.shape
 # 	if w > h:  # 宽大于高，顺时针旋转
 # 		width, height = w, h
-# 		M = cv2.cv2.getRotationMatrix2D((box[0][0], box[0][1]), rect[2], 1)
+# 		M = cv2.getRotationMatrix2D((box[0][0], box[0][1]), rect[2], 1)
 # 		rect_img = cv2.warpAffine(oldimg, M, (oldimg.shape[0], oldimg.shape[1]))
 # 		imshow(rect_img)
 # 		# 扩大范围
@@ -138,62 +226,5 @@ for contour in contours:
 # 	rect_img = rect_img[minY:maxY, minX:maxX]
 # 	imshow(rect_img)
 # 	car_imgs.append(rect_img)
-
-card_imgs = []
-# 矩形区域可能是倾斜的矩形
-for rect in car_rects:
-	angle = 1 if -1 < rect[2] < 1 else rect[2]
-	# 扩大rect范围，避免车牌边缘被排除
-	# rect = (rect[0], (rect[1][0] + 5, rect[1][1] + 5), angle)
-	'''
-	.................*(top).................... - - >
-	| ........*(left)..*.......................
-	| .........*........*(right)..............
-	v ..........*(low).........................
-	左：x坐标最小，右：x坐标最大，顶：y坐标最小，底：y坐标最大
-	'''
-	box = cv2.boxPoints(rect)
-	box = np.int0(box)
-	contour_img = cv2.drawContours(oldimg, [box], 0, (0, 0, 255), 2)
-	imshow(contour_img)
-
-	# # 按第一列排序
-	# box = box[np.lexsort(box[:, ::-1].T)]
-	# left_point, right_point = box[0], box[-1]
-	# # 按最后一列排序
-	# box = box[np.lexsort(box.T)]
-	# height_point, low_point = box[0], box[-1]
-	#
-	# if left_point[1] <= right_point[1]:  # 正角度
-	# 	new_right_point = [right_point[0], height_point[1]]
-	# 	pts2 = np.float32([left_point, height_point, new_right_point])  # 字符只是高度需要改变
-	# 	pts1 = np.float32([left_point, height_point, right_point])
-	# 	M = cv2.getAffineTransform(pts1, pts2)  # 仿射变换
-	# 	dst = cv2.warpAffine(oldimg, M, (pic_width, pic_height))
-	# 	point_limit(new_right_point)
-	# 	point_limit(height_point)
-	# 	point_limit(left_point)
-	# 	card_img = dst[int(left_point[1]):int(height_point[1]), int(left_point[0]):int(new_right_point[0])]
-	# 	card_imgs.append(card_img)
-	# elif left_point[1] > right_point[1]:  # 负角度
-	# 	new_left_point = [left_point[0], height_point[1]]
-	# 	pts2 = np.float32([new_left_point, height_point, right_point])  # 字符只是高度需要改变
-	# 	pts1 = np.float32([left_point, height_point, right_point])
-	# 	M = cv2.getAffineTransform(pts1, pts2)
-	# 	dst = cv2.warpAffine(oldimg, M, (pic_width, pic_height))
-	# 	point_limit(right_point)
-	# 	point_limit(height_point)
-	# 	point_limit(new_left_point)
-	# 	card_img = dst[int(right_point[1]):int(height_point[1]), int(new_left_point[0]):int(right_point[0])]
-	# 	card_imgs.append(card_img)
-	# imshow(card_img)
-
-
-
-
-
-
-
-
 
 
