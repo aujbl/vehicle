@@ -36,7 +36,7 @@ for c in j["config"]:
 
 blur = 5
 img = cv2.GaussianBlur(img, (blur, blur), 0)
-oldimg = img
+old_img = img
 img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 # #开操作
@@ -77,28 +77,26 @@ for contour in contours:
 # imshow(contour_img)
 
 car_imgs = []
-# 矩形区域可能是倾斜的矩形
+# 将向不同角度倾斜的矩形调整为水平，并截取下来
 for rect in car_rects:
-
-	box = cv2.boxPoints(rect)
-	box = np.int0(box)
-	oldimg = cv2.drawContours(oldimg, [box], 0, (0, 0, 255), 2)
-
+	'''测试候选框调整结果'''
+	# box = cv2.boxPoints(rect)
+	# box = np.int0(box)
+	# oldimg = cv2.drawContours(oldimg, [box], 0, (0, 0, 255), 2)
 	(cen_x, cen_y), (w, h), angle = rect
-	angle = angle if w > h else -angle - 90
-	print('(w, h): ', rect[1], 'angle: ', rect[2])
-	print('new angle: ', angle)
+	angle = angle if w > h else angle + 90
 	if w < h:
 		w, h = h, w
 	left, right = int(cen_x - w / 2), int(cen_x + w / 2)
 	up, down = int(cen_y - h / 2), int(cen_y + h / 2)
 	if angle % 90 == 0:
-		rotate_img = oldimg
+		rotate_img = old_img
 	else:
 		M = cv2.getRotationMatrix2D((cen_x, cen_y), angle, 1)
-		rotate_img = cv2.warpAffine(oldimg, M, (oldimg.shape[1], oldimg.shape[0]))
+		rotate_img = cv2.warpAffine(old_img, M, (old_img.shape[1], old_img.shape[0]))
 	car_img = rotate_img[up:down, left:right]
-
+	car_imgs.append(car_img)
+	'''测试候选框调整结果'''
 	# plt.figure()
 	# plt.subplot(1, 3, 1)
 	# plt.imshow(oldimg)
@@ -108,9 +106,6 @@ for rect in car_rects:
 	# plt.imshow(car_img)
 	# plt.show()
 
-	# angle = 1 if -1 < rect[2] < 1 else rect[2]
-	# 扩大rect范围，避免车牌边缘被排除
-	# rect = (rect[0], (rect[1][0] + 5, rect[1][1] + 5), angle)
 	'''
 	.................*(top).................... - - >
 	| ........*(left)..*.......................
@@ -118,113 +113,15 @@ for rect in car_rects:
 	v ..........*(low).........................
 	左：x坐标最小，右：x坐标最大，顶：y坐标最小，底：y坐标最大
 	'''
-	# box = cv2.boxPoints(rect)
-	# box = np.int0(box)
-	# contour_img = cv2.drawContours(oldimg, [box], 0, (0, 0, 255), 2)
-	# imshow(contour_img)
-
-
 	# # 按第一列排序
 	# box = box[np.lexsort(box[:, ::-1].T)]
 	# left_point, right_point = box[0], box[-1]
 	# # 按最后一列排序
 	# box = box[np.lexsort(box.T)]
 	# height_point, low_point = box[0], box[-1]
-	#
-	# if left_point[1] <= right_point[1]:  # 正角度
-	# 	new_right_point = [right_point[0], height_point[1]]
-	# 	pts2 = np.float32([left_point, height_point, new_right_point])  # 字符只是高度需要改变
-	# 	pts1 = np.float32([left_point, height_point, right_point])
-	# 	M = cv2.getAffineTransform(pts1, pts2)  # 仿射变换
-	# 	dst = cv2.warpAffine(oldimg, M, (pic_width, pic_height))
-	# 	point_limit(new_right_point)
-	# 	point_limit(height_point)
-	# 	point_limit(left_point)
-	# 	card_img = dst[int(left_point[1]):int(height_point[1]), int(left_point[0]):int(new_right_point[0])]
-	# 	card_imgs.append(card_img)
-	# elif left_point[1] > right_point[1]:  # 负角度
-	# 	new_left_point = [left_point[0], height_point[1]]
-	# 	pts2 = np.float32([new_left_point, height_point, right_point])  # 字符只是高度需要改变
-	# 	pts1 = np.float32([left_point, height_point, right_point])
-	# 	M = cv2.getAffineTransform(pts1, pts2)
-	# 	dst = cv2.warpAffine(oldimg, M, (pic_width, pic_height))
-	# 	point_limit(right_point)
-	# 	point_limit(height_point)
-	# 	point_limit(new_left_point)
-	# 	card_img = dst[int(right_point[1]):int(height_point[1]), int(new_left_point[0]):int(right_point[0])]
-	# 	card_imgs.append(card_img)
-	# imshow(card_img)
 
 
 
 
-
-
-
-
-
-# # 对可能的区域进行旋转调整和扩大范围
-# car_imgs = []
-# for rect in car_rects:
-# 	box = cv2.boxPoints(rect)
-# 	w, h = rect[1]
-# 	extraX = 5
-# 	extraY = 10
-# 	imgWidth, imgHeight = img.shape
-# 	if w > h:  # 宽大于高，顺时针旋转
-# 		width, height = w, h
-# 		M = cv2.getRotationMatrix2D((box[0][0], box[0][1]), rect[2], 1)
-# 		rect_img = cv2.warpAffine(oldimg, M, (oldimg.shape[0], oldimg.shape[1]))
-# 		imshow(rect_img)
-# 		# 扩大范围
-# 		if int(box[0][0]) - extraX < 0:
-# 			minX = 0
-# 		else:
-# 			minX = int(box[0][0]) - extraX
-#
-# 		if int(box[0][0]) + int(width) + extraX > imgWidth + 99:
-# 			maxX = imgWidth + 99
-# 		else:
-# 			maxX = int(box[0][0]) + int(width) + extraX
-#
-# 		if int(box[0][1]) - int(height) - extraY < 0:
-# 			minY = 0
-# 		else:
-# 			minY = int(box[0][1]) - int(height) - extraY
-#
-# 		if int(box[0][1]) + extraY > imgHeight + 99:
-# 			maxY = imgHeight + 99
-# 		else:
-# 			maxY = int(box[0][1]) + extraY
-#
-# 	else:  # 宽小于高，逆时针旋转
-# 		width, height = h, w
-# 		M = cv2.cv2.getRotationMatrix2D((box[0][0], box[0][1]), rect[2], 1)
-# 		rect_img = cv2.warpAffine(oldimg, M, (oldimg.shape[1], oldimg.shape[0]))
-# 		imshow(rect_img)
-# 		# 扩大范围
-# 		if int(box[0][0]) - extraX < 0:
-# 			minX = 0
-# 		else:
-# 			minX = int(box[0][0]) - extraX
-#
-# 		if int(box[0][0]) + int(width) + extraX > imgWidth + 99:
-# 			maxX = imgWidth + 99
-# 		else:
-# 			maxX = int(box[0][0]) + int(width) + extraX
-#
-# 		if int(box[0][1]) - extraY < 0:
-# 			minY = 0
-# 		else:
-# 			minY = int(box[0][1]) - extraY
-#
-# 		if int(box[0][1]) + int(height) + extraY > imgHeight + 99:
-# 			maxY = imgHeight + 99
-# 		else:
-# 			maxY = int(box[0][1]) + int(height) + extraY
-#
-# 	rect_img = rect_img[minY:maxY, minX:maxX]
-# 	imshow(rect_img)
-# 	car_imgs.append(rect_img)
 
 
