@@ -11,17 +11,14 @@ MAX_WIDTH = 1000 # 原始图片最大宽度
 Min_Area = 2000  # 车牌区域允许最大面积
 PROVINCE_START = 1000
 
-def imshow(img, name='img'):
-	cv2.imshow(name, img)
-	cv2.waitKey(0)
+'''注意OpenCV默认BGR，matplotlib默认RGB'''
+# def imshow(img, name='img'):
+# 	cv2.imshow(name, img)
+# 	cv2.waitKey(0)
 
-def point_limit(point):
-	if point[0] < 0:
-		point[0] = 0
-	if point[1] < 0:
-		point[1] = 0
-
-pic_file = './test_img/green.jpg'
+# pic_file = './test_img/green.jpg'
+pic_file = './test_img/blue.jpg'
+# pic_file = './test_img/yellow.jpg'
 img = cv2.imread(pic_file)
 pic_height, pic_width = img.shape[:2]
 
@@ -82,13 +79,18 @@ for rect in car_rects:
 	'''测试候选框调整结果'''
 	# box = cv2.boxPoints(rect)
 	# box = np.int0(box)
-	# oldimg = cv2.drawContours(oldimg, [box], 0, (0, 0, 255), 2)
+	# old_img = cv2.drawContours(old_img, [box], 0, (0, 0, 255), 2)
 	(cen_x, cen_y), (w, h), angle = rect
 	angle = angle if w > h else angle + 90
 	if w < h:
 		w, h = h, w
 	left, right = int(cen_x - w / 2), int(cen_x + w / 2)
 	up, down = int(cen_y - h / 2), int(cen_y + h / 2)
+	# 可以考虑是否扩大矩形范围，以完整覆盖车牌区域
+	extra_rows, extra_cols = int(0.05*(down-up)), int(0.05*(right-left))
+	left, right = max(0, left-extra_cols), min(right+extra_cols, old_img.shape[1])
+	up, down = max(0, up-extra_rows), min(down+extra_rows, old_img.shape[0])
+
 	if angle % 90 == 0:
 		rotate_img = old_img
 	else:
@@ -99,7 +101,7 @@ for rect in car_rects:
 	'''测试候选框调整结果'''
 	# plt.figure()
 	# plt.subplot(1, 3, 1)
-	# plt.imshow(oldimg)
+	# plt.imshow(old_img)
 	# plt.subplot(1, 3, 2)
 	# plt.imshow(rotate_img)
 	# plt.subplot(1, 3, 3)
@@ -119,6 +121,112 @@ for rect in car_rects:
 	# # 按最后一列排序
 	# box = box[np.lexsort(box.T)]
 	# height_point, low_point = box[0], box[-1]
+
+limit_dict = {'yellow': [11, 34, 43, 46], 'green':  [35, 99, 43, 46], 'blue':   [100, 155, 43, 46]}
+
+def fineMap(color, hsv_img):
+	limit_H1, limit_H2, limit_S, limit_V = limit_dict[color]
+	rows, cols = hsv_img.shape[:2]
+	left, right, up, down = cols-1, 0, rows-1, 0
+	rows_limit = rows * 0.5 if color != 'green' else rows * 0.3
+	cols_limit = cols * 0.3
+	# 确定这一行是否属于车牌，最小的行为上边界，最大的行为下边界
+	for i in range(rows):
+		cnt = 0
+		for j in range(cols):
+			H, S, V = hsv_img[i][j]
+			if limit_H1 <= H <= limit_H2 and S >= limit_S and V >= limit_V:
+				cnt += 1
+		if cnt > cols_limit:
+			up, down = min(up, i), max(down, i)
+	# 确定某一列是否属于车牌，最小为左边界，最大为右边界
+	for j in range(cols):
+		cnt = 0
+		for i in range(rows):
+			H, S, V = hsv_img[i][j]
+			if limit_H1 <= H <= limit_H2 and S >= limit_S and V >= limit_V:
+				cnt += 1
+		if cnt > rows_limit:
+			left, right = min(left, j), max(right, j)
+	return left, right, up, down
+
+colors = []
+plates = []
+for car_img in car_imgs:
+	green = yellow = blue = 0
+
+	plt.figure()
+	plt.imshow(car_img)
+	plt.show()
+
+	hsv_img = cv2.cvtColor(car_img, cv2.COLOR_BGR2HSV)
+	rows, cols = hsv_img.shape[:2]
+	pixels = rows * cols
+
+	for i in range(rows):
+		for j in range(cols):
+			H, S, V = hsv_img[i][j]
+			if limit_dict['yellow'][0] <= H < limit_dict['yellow'][1] \
+					and S >= limit_dict['yellow'][2] and V >= limit_dict['yellow'][3]:
+				yellow += 1
+			elif limit_dict['green'][0] <= H <= limit_dict['green'][1] \
+					and S >= limit_dict['green'][2] and V >= limit_dict['green'][3]:
+				green += 1
+			elif limit_dict['blue'][0] <= H <= limit_dict['blue'][1] \
+					and S >= limit_dict['blue'][2] and V >= limit_dict['blue'][3]:
+				blue += 1
+	max_color = max(yellow, green, blue)
+	if max_color == yellow and 0.45 * pixels < yellow < 0.95 * pixels:
+		color = 'yellow'
+		# left, right, up, down = fineMap(color, hsv_img)
+	elif max_color == blue and 0.45 * pixels < blue < 0.95 * pixels:
+		color = 'blue'
+		# left, right, up, down = fineMap(color, hsv_img)
+	elif max_color == green and 0.35 * pixels < green < 0.95 * pixels:
+		color = 'green'
+	else:
+		color = 'other'
+	if color != 'other':
+		left, right, up, down = fineMap(color, hsv_img)
+		plate = car_img[up:down, left:right]
+		colors.append(color)
+		plates.append(plate)
+		print('rows: ', rows, 'cols: ', cols, 'color: ', color)
+		print('left: %d, right: %d, up: %d, down: %d' % (left, right, up, down), '\n')
+		plate = cv2.cvtColor(plate, cv2.COLOR_BGR2RGB)
+		plt.figure()
+		plt.imshow(plate)
+		plt.show()
+	else:
+		print('yellow/pixels:', yellow/pixels)
+		print('blue/pixels: ', blue/pixels)
+		print('green/pixels: ', green/pixels)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
