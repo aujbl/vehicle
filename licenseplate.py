@@ -16,8 +16,8 @@ PROVINCE_START = 1000
 # 	cv2.imshow(name, img)
 # 	cv2.waitKey(0)
 
-# pic_file = './test_img/green.jpg'
-pic_file = './test_img/blue.jpg'
+pic_file = './test_img/green.jpg'
+# pic_file = './test_img/blue.jpg'
 # pic_file = './test_img/yellow.jpg'
 img = cv2.imread(pic_file)
 pic_height, pic_width = img.shape[:2]
@@ -31,7 +31,7 @@ for c in j["config"]:
 	else:
 		raise RuntimeError('[ ERROR ] 没有设置有效配置参数.')
 
-blur = 5
+blur = 3
 img = cv2.GaussianBlur(img, (blur, blur), 0)
 old_img = img
 img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -128,7 +128,8 @@ def fineMap(color, hsv_img):
 	limit_H1, limit_H2, limit_S, limit_V = limit_dict[color]
 	rows, cols = hsv_img.shape[:2]
 	left, right, up, down = cols-1, 0, rows-1, 0
-	rows_limit = rows * 0.5 if color != 'green' else rows * 0.3
+	# 绿牌上面是白边
+	rows_limit = rows * 0.5 if color != 'green' else rows * 0.15
 	cols_limit = cols * 0.3
 	# 确定这一行是否属于车牌，最小的行为上边界，最大的行为下边界
 	for i in range(rows):
@@ -148,17 +149,15 @@ def fineMap(color, hsv_img):
 				cnt += 1
 		if cnt > rows_limit:
 			left, right = min(left, j), max(right, j)
+	# 补上绿牌的白边
+	if color == 'green':
+		up = max(0, up - int(0.25*(down-up)))
 	return left, right, up, down
 
 colors = []
 plates = []
 for car_img in car_imgs:
 	green = yellow = blue = 0
-
-	plt.figure()
-	plt.imshow(car_img)
-	plt.show()
-
 	hsv_img = cv2.cvtColor(car_img, cv2.COLOR_BGR2HSV)
 	rows, cols = hsv_img.shape[:2]
 	pixels = rows * cols
@@ -191,17 +190,45 @@ for car_img in car_imgs:
 		plate = car_img[up:down, left:right]
 		colors.append(color)
 		plates.append(plate)
-		print('rows: ', rows, 'cols: ', cols, 'color: ', color)
-		print('left: %d, right: %d, up: %d, down: %d' % (left, right, up, down), '\n')
-		plate = cv2.cvtColor(plate, cv2.COLOR_BGR2RGB)
-		plt.figure()
-		plt.imshow(plate)
-		plt.show()
-	else:
-		print('yellow/pixels:', yellow/pixels)
-		print('blue/pixels: ', blue/pixels)
-		print('green/pixels: ', green/pixels)
+	# 	print('rows: ', rows, 'cols: ', cols, 'color: ', color)
+	# 	print('left: %d, right: %d, up: %d, down: %d' % (left, right, up, down), '\n')
+	# 	plate = cv2.cvtColor(plate, cv2.COLOR_BGR2RGB)
+	# 	plt.figure()
+	# 	plt.imshow(plate)
+	# 	plt.show()
+	# else:
+	# 	print('yellow/pixels:', yellow/pixels)
+	# 	print('blue/pixels: ', blue/pixels)
+	# 	print('green/pixels: ', green/pixels)
 
+plt.figure()
+plt.axis('off')
+for plate, color in zip(plates, colors):
+	gray_img = cv2.cvtColor(plate, cv2.COLOR_BGR2GRAY)
+	# 若不分类会出现蓝牌白底黑字，其他黑底白字
+	if color == 'blue':
+		ret, thresh_img = cv2.threshold(gray_img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+	else:
+		ret, thresh_img = cv2.threshold(gray_img, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+	# 去除车牌顶部的两棵钉
+	rows, cols = thresh_img.shape[:2]
+	for i in range(rows):
+		jump, pixel = 0, thresh_img[i][0]
+		for j in range(1, cols):
+			if pixel != thresh_img[i][j]:
+				jump += 1
+				pixel = thresh_img[i][j]
+		if jump < 8:
+			thresh_img[i][:] = 0
+
+	plate = cv2.cvtColor(plate, cv2.COLOR_BGR2RGB)
+	plt.subplot(1, 3, 1)
+	plt.imshow(plate)
+	plt.subplot(1, 3, 2)
+	plt.imshow(gray_img, cmap='gray')
+	plt.subplot(1, 3, 3)
+	plt.imshow(thresh_img, cmap='gray')
+	plt.show()
 
 
 
