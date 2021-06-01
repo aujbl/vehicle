@@ -221,6 +221,11 @@ for plate, color in zip(plates, colors):
 		if jump < 8:
 			thresh_img[i][:] = 0
 
+	# 分割字符
+	hist_img = thresh_img.sum(axis=0)
+
+
+
 	plate = cv2.cvtColor(plate, cv2.COLOR_BGR2RGB)
 	plt.subplot(1, 3, 1)
 	plt.imshow(plate)
