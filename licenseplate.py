@@ -201,6 +201,14 @@ for car_img in car_imgs:
 	# 	print('blue/pixels: ', blue/pixels)
 	# 	print('green/pixels: ', green/pixels)
 
+def findInterval(accumulation, intervalPre):
+	min = 1  # 最小值
+	for m in range(len(intervalPre)):
+		if accumulation[intervalPre[m]] < min:
+			min = accumulation[intervalPre[m]]
+			minIndex = intervalPre[m]
+	return minIndex
+
 plt.figure()
 plt.axis('off')
 for plate, color in zip(plates, colors):
@@ -221,19 +229,92 @@ for plate, color in zip(plates, colors):
 		if jump < 8:
 			thresh_img[i][:] = 0
 
-	# 分割字符
-	hist_img = thresh_img.sum(axis=0)
-
-
-
-	plate = cv2.cvtColor(plate, cv2.COLOR_BGR2RGB)
-	plt.subplot(1, 3, 1)
-	plt.imshow(plate)
-	plt.subplot(1, 3, 2)
-	plt.imshow(gray_img, cmap='gray')
-	plt.subplot(1, 3, 3)
 	plt.imshow(thresh_img, cmap='gray')
 	plt.show()
+
+	# 分割字符
+	hist_img = thresh_img.sum(axis=0)
+	hist_max, hist_min = max(hist_img), min(hist_img)
+	hist_img = (hist_img - hist_min) / (hist_max - hist_min)
+
+	successive = []
+	intervalPre = []
+	isPreviousLess = 0
+	for m in range(len(hist_img)):
+		if isPreviousLess:
+			if hist_img[m] <= 0.2:
+				successive.append(m)
+			else:
+				isPreviousLess = 0
+				intervalPre.append(successive)
+				successive = []
+		else:
+			if hist_img[m] <= 0.2:
+				isPreviousLess = 1
+				successive.append(m)
+
+	# 找到最大间隔，为省市和编号之间的间隔
+	intervalLen = 0
+	for n in range(len(intervalPre)):
+		if len(intervalPre[n]) > intervalLen:
+			intervalLen = len(intervalPre[n])
+			bigInterval = intervalPre[n]
+			bigIntervalIndex = n
+
+	# 找到最大间隔的前一个间隔，即省简称和字母之间的间隔
+	if bigIntervalIndex >= 1:
+		minIndex = findInterval(hist_img, intervalPre[bigIntervalIndex - 1])
+
+	thresh_img = thresh_img[:, minIndex:]  # 截取字母区域
+	contours, heirachy = cv2.findContours(thresh_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)  # 获取连通区域
+
+	cntNum = 7 if color == 'green' else 6
+
+	list = []
+	for m in range(len(contours)):
+		tuple = (m, cv2.contourArea(contours[m]))
+		list.append(tuple)
+	list.sort(key=lambda x: x[1], reverse=True)
+
+	bigCnts = []  # 字母连通区域
+	for n in range(cntNum):
+		bigCnts.append(contours[list[n][0]])
+
+	# 通过x坐标排序
+	list = []
+	for n in range(cntNum):  # 外接矩形
+		x, y, width, height = cv2.boundingRect(bigCnts[n])
+		tuple = (n, x)
+		list.append(tuple)
+	list.sort(key=lambda x: x[1])
+
+	cnts = []  # 从左到右，字母连通区域
+	for n in range(cntNum):
+		cnts.append(bigCnts[list[n][0]])
+
+	# 裁剪
+	letters = []
+	for cnt in cnts:
+		x, y, width, height = cv2.boundingRect(cnt)
+		letter = img[y:y + height, x:x + width]
+		letter = cv2.resize(letter, (32, 64), interpolation=cv2.INTER_CUBIC)
+		letters.append(letter)
+	# imshow(str(cnt), letter)
+
+
+	for letter in letters:
+		plt.imshow(letter, cmap='gray')
+		plt.show()
+
+
+	# plate = cv2.cvtColor(plate, cv2.COLOR_BGR2RGB)
+	# plt.subplot(1, 3, 1)
+	# plt.imshow(plate)
+	# plt.subplot(1, 3, 2)
+	# plt.imshow(gray_img, cmap='gray')
+	# plt.subplot(1, 3, 3)
+	# plt.imshow(thresh_img, cmap='gray')
+	# plt.show()
 
 
 
