@@ -12,9 +12,9 @@ Min_Area = 2000  # 车牌区域允许最大面积
 PROVINCE_START = 1000
 
 '''注意OpenCV默认BGR，matplotlib默认RGB'''
-# def imshow(img, name='img'):
-# 	cv2.imshow(name, img)
-# 	cv2.waitKey(0)
+def imshow(img, name='img'):
+	cv2.imshow(name, img)
+	cv2.waitKey(0)
 
 pic_file = './test_img/green.jpg'
 # pic_file = './test_img/blue.jpg'
@@ -67,11 +67,12 @@ for contour in contours:
 	# 长宽比例约为2~5.5的比较可能为车牌
 	if 2 < ratio < 5.5:
 		car_rects.append(rect)
-		# rect = (rect[0], (rect[1][0]+3, rect[1][1]+3), rect[2])
+# 		rect = (rect[0], (rect[1][0] + 3, rect[1][1] + 3), rect[2])
 # 		box = cv2.boxPoints(rect)
 # 		box = np.int0(box)
-# 		contour_img = cv2.drawContours(oldimg, [box], 0, (0, 0, 255), 2)
+# 		contour_img = cv2.drawContours(old_img, [box], 0, (0, 0, 255), 2)
 # imshow(contour_img)
+
 
 car_imgs = []
 # 将向不同角度倾斜的矩形调整为水平，并截取下来
